@@ -13,19 +13,26 @@ module ServiceContractWebmock
     INT = Avro::Schema::PrimitiveSchema.new(:int)
 
     def to_regex
-      params = (fields + [Field.new('page', INT), Field.new('per_page', INT)]).map do |field|
+      params = fields_and_pagination.map do |field|
         "#{field.name}=#{field.value}&?"
       end.join("|")
       "(#{params})+"
     end
 
+    def fields_and_pagination
+      fields + pagination_fields
+    end
+
+    def pagination_fields
+      [Field.new('page', INT), Field.new('per_page', INT)]
+    end
 
     def fields
       @fields ||= endpoint.parameters.map do |param|
         param.type.definition.fields.map do |field|
-          Field.new(field.name, field.type)
+          Field.new(field.name, field.type) unless ['page', 'per_page'].include?(field.name)
         end
-      end.flatten
+      end.flatten.compact
     end
 
     def field_int?(name)
