@@ -28,10 +28,11 @@ module ServiceContractWebmock
     end
 
     def stub_show_request
+      key = contract.endpoint("show").parameters.first.name
       stub_request(:get, "#{name}/\\d+\\.json").
         to_return do |request|
           id = request.uri.path.scan(/\/(\d+)\.json/)[0][0].to_i
-          found = resources.select {|r| r['id'] == id}
+          found = resources.select {|r| r[key] == id}
 
           if found.present?
             {
