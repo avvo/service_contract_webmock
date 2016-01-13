@@ -28,6 +28,7 @@ module ServiceContractWebmock
     end
 
     def stub_show_request
+      return if contract.endpoint("show").nil?
       key = contract.endpoint("show").parameters.first.name
       stub_request(:get, "#{name}/\\d+\\.json").
         to_return do |request|
