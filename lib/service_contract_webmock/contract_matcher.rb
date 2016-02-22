@@ -29,8 +29,12 @@ module ServiceContractWebmock
 
     def fields
       @fields ||= endpoint.parameters.map do |param|
-        param.type.definition.fields.map do |field|
-          Field.new(field.name, field.type) unless ['page', 'per_page'].include?(field.name)
+        if param.type.definition.is_a?(Avro::Schema::PrimitiveSchema)
+          Field.new(param.name, param.type.definition)
+        else
+          param.type.definition.fields.map do |field|
+            Field.new(field.name, field.type) unless ['page', 'per_page'].include?(field.name)
+          end
         end
       end.flatten.compact
     end
