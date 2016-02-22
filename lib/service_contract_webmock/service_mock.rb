@@ -15,6 +15,7 @@ module ServiceContractWebmock
       stub_index_request
       stub_search_request
       stub_show_request
+      yield self if block_given?
     end
 
     def stub_request(method, path)
