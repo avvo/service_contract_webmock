@@ -43,6 +43,8 @@ module ServiceContractWebmock
         case type.items.type_sym
         when :int
           "[,\\d]+"
+        when :enum
+          "(#{type.items.symbols.map{|symbol| "#{symbol}(\..+)?"}.join("|")})"
         else
           raise "unhandled array subtype #{type.items.type_sym}"
         end
