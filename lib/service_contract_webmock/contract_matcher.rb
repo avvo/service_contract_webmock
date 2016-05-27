@@ -46,7 +46,7 @@ module ServiceContractWebmock
     end
 
     def extract_request(query)
-      params = CGI.parse(query)
+      params = CGI.parse(query).except("includes", "page", "per_page")
       fields.select {|field| field.name.in?(params.keys)}.each_with_object({}) do |field, acc|
         data = params[field.name][0].split(',').flat_map {|value| field.convert(value)}
         acc[field.name] = data
