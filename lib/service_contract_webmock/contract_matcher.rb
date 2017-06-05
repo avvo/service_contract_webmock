@@ -54,6 +54,12 @@ module ServiceContractWebmock
     end
 
     def found(query)
+      records = do_search(query)
+
+      apply_pagination(records, query)
+    end
+
+    def do_search(query)
       search = extract_request(query)
       if search.empty?
         resources
@@ -65,6 +71,15 @@ module ServiceContractWebmock
           end
         end
       end
+    end
+
+    def apply_pagination(records, query)
+      params = CGI.parse(query)
+      if params["per_page"].present? && params["per_page"].first.present?
+        per_page = params["per_page"].first.to_i
+        records = records.take(per_page)
+      end
+      records
     end
   end
 end
