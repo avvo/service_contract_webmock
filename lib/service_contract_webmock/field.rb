@@ -54,6 +54,8 @@ module ServiceContractWebmock
         ".+"
       when :boolean
         "true|false"
+      when :float
+        "\\d+\.\\d+"
       else
         raise "unhandled type #{type.type_sym}"
       end
