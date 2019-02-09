@@ -46,9 +46,10 @@ module ServiceContractWebmock
     end
 
     def extract_request(query)
-      params = CGI.parse(query).except("includes", "page", "per_page", "order")
-      fields.select {|field| field.name.in?(params.keys)}.each_with_object({}) do |field, acc|
-        data = params[field.name][0].split(',').flat_map {|value| field.convert(value)}
+      params = Rack::Utils.parse_nested_query(query).except("includes", "page", "per_page", "order")
+      fields.select {|field| field.name.in?(params.keys) }.each_with_object({}) do |field, acc|
+        val = params[field.name]
+        data = (val.is_a?(Array) ? val : val.split(',')).flat_map {|value| field.convert(value)}
         acc[field.name] = data
       end
     end
