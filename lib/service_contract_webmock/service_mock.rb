@@ -1,3 +1,4 @@
+require 'rack'
 require 'webmock'
 
 module ServiceContractWebmock
@@ -24,8 +25,15 @@ module ServiceContractWebmock
 
     def stub_index_request
       stub_request(:get, "#{name}\\.json\\??$")
-        .to_return(body: { name => resources }.to_json,
-                  headers: { 'Content-Type' => 'application/json' })
+        .to_return do |request|
+          {
+            body: {
+              name => apply_pagination(request, resources),
+              meta: pagination_meta(request, resources).merge({ status: 200 })
+            }.to_json,
+            headers: { 'Content-Type' => 'application/json' }
+          }
+        end
     end
 
     def stub_show_request
@@ -38,7 +46,7 @@ module ServiceContractWebmock
 
           if found.present?
             {
-              body: { name => found }.to_json,
+              body: { name => found, meta: { status: 200 } }.to_json,
               headers: { 'Content-Type' => 'application/json' }
             }
           else
@@ -55,11 +63,46 @@ module ServiceContractWebmock
       matcher = ContractMatcher.new(contract.endpoint("index"), resources)
       stub_request(:get, "#{name}\\.json\\?#{matcher.to_regex}").
         to_return do |request|
+          found = matcher.found(request.uri.query)
           {
-            body: { name => matcher.found(request.uri.query) }.to_json,
+            body: {
+              name => apply_pagination(request, found),
+              meta: pagination_meta(request, found).merge({ status: 200})
+            }.to_json,
             headers: { 'Content-Type' => 'application/json' }
           }
         end
+    end
+
+    private
+    def apply_pagination(request, resources)
+      pagination_params = extract_pagination_params(request.uri.query, resources)
+      per_page = pagination_params["per_page"].to_i
+      current_page = pagination_params["page"].to_i
+
+      resources.slice(((current_page - 1) * per_page), per_page) || []  # Array#slice returns nil when index is out of bounds
+    end
+
+    def pagination_meta(request, resources)
+      pagination_params = extract_pagination_params(request.uri.query, resources)
+      per_page = pagination_params["per_page"].to_i
+      total_pages = resources.count / per_page
+      total_pages += 1 if resources.count % per_page > 0
+
+      {
+        current_page: pagination_params["page"].to_i,
+        per_page: per_page,
+        total_pages: total_pages,
+        total_entries: resources.count
+      }
+    end
+
+    def extract_pagination_params(query, resources)
+      params = Rack::Utils.parse_nested_query(query).slice("page", "per_page")
+      params["page"] = 1 if params["page"].nil? || params["page"].empty?
+      params["per_page"] = [resources.count, 1].max if params["per_page"].nil? || params["per_page"].empty?
+
+      params
     end
   end
 end

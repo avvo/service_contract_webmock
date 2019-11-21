@@ -1,4 +1,4 @@
-require 'cgi'
+require 'rack'
 require 'avro'
 
 module ServiceContractWebmock
@@ -14,7 +14,7 @@ module ServiceContractWebmock
 
     def to_regex
       params = fields_and_pagination.map do |field|
-        "#{field.name}=#{field.value}&?"
+        "#{field.name}(%5B%5D)?=#{field.value}&?"
       end.join("|")
       "(#{params})+"
     end
@@ -55,12 +55,6 @@ module ServiceContractWebmock
     end
 
     def found(query)
-      records = do_search(query)
-
-      apply_pagination(records, query)
-    end
-
-    def do_search(query)
       search = extract_request(query)
       if search.empty?
         resources
@@ -74,13 +68,5 @@ module ServiceContractWebmock
       end
     end
 
-    def apply_pagination(records, query)
-      params = CGI.parse(query)
-      if params["per_page"].present? && params["per_page"].first.present?
-        per_page = params["per_page"].first.to_i
-        records = records.take(per_page)
-      end
-      records
-    end
-  end
+ end
 end
