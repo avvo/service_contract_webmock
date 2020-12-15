@@ -10,8 +10,14 @@ Gem::Specification.new do |spec|
   spec.email         = ["donald.plummer@gmail.com"]
 
   spec.summary       = %q{A library for generating webmock mocks with ServiceContract schemas}
-  spec.homepage      = "https://github.com/dplummer/service_contract_webmock"
+  spec.homepage      = "https://github.com/avvo/service_contract_webmock"
   spec.license       = "MIT"
+
+  if spec.respond_to?(:metadata)
+    spec.metadata["allowed_push_host"] = "https://avvo-gems.public.artifactory.internetbrands.com"
+  else
+    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
+  end
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
@@ -21,9 +27,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "avro"
   spec.add_dependency "service_contract"
   spec.add_dependency "webmock"
-  spec.add_dependency "rack", ">= 1.0"
+  spec.add_dependency "rack", ">= 2.1.4"
 
-  spec.add_development_dependency "bundler", "~> 1.10"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "bundler"
+  spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "rspec"
 end
