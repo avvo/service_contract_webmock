@@ -3,6 +3,17 @@
 A library for taking Avro contracts from ServiceContract and generating Webmock
 HTTP mocks to return fixture data.
 
+## Tested Ruby Versions
+
+| Version | Result             |
+| ------- | ------------------ |
+| 2.7.1   | :heavy_check_mark: |
+| 2.6.6   | :heavy_check_mark: |
+| 2.5.8   | :heavy_check_mark: |
+| 2.4.10  | :heavy_check_mark: |
+| 2.3.8   | :heavy_check_mark: |
+| 2.2.10  | :heavy_check_mark: |
+
 ## Installation
 
 Install ServiceContractWebmock from the command line:

@@ -15,6 +15,8 @@ jobs:
       - checkout
       - artifact-management/gem-test:
           test_command: bundle exec rake spec
+          post_test_command: rm Gemfile.lock
+          ruby_versions: "2.2.10,2.3.8,2.4.10,2.5.8,2.6.6,2.7.1"
 
   build:
     docker:
