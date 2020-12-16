@@ -1,3 +1,3 @@
 module ServiceContractWebmock
-  VERSION = "0.3.1pre1"
+  VERSION = "0.3.1"
 end
